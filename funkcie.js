@@ -77,10 +77,40 @@ function init() {
 }
 
 
-// --- OVLÁDANIE ---
+// --- OVLÁDANIE (KLÁVESNICA AJ DOTYK PRE MOBIL) ---
 const keys = {};
+
+// Sledovanie klávesnice pre počítače
 window.addEventListener("keydown", (e) => keys[e.code] = true);
 window.addEventListener("keyup", (e) => keys[e.code] = false);
+
+// Nové dotykové ovládanie pre smartfóny
+window.addEventListener("touchstart", (e) => {
+    // Ak sa hráč dotýka tlačidiel v menu (Uložiť, Reštart, Rebríček), nebudeme mu brať kontrolu nad pohybom
+    if (e.target.tagName === "BUTTON" || e.target.tagName === "INPUT") return;
+
+    // Zistíme horizontálnu polohu prvého dotyku prsta na displeji
+    let touchX = e.touches[0].clientX;
+    // Zistíme aktuálnu celkovú šírku obrazovky mobilu
+    let windowWidth = window.innerWidth;
+
+    if (touchX < windowWidth / 2) {
+        // Dotyk na ľavej polovici obrazovky = letíme vľavo
+        keys["ArrowLeft"] = true;
+        keys["ArrowRight"] = false;
+    } else {
+        // Dotyk na pravej polovici obrazovky = letíme vpravo
+        keys["ArrowRight"] = true;
+        keys["ArrowLeft"] = false;
+    }
+});
+
+// Keď hráč zdvihne prst z obrazovky mobilu, pohyb a saltá okamžite zastavíme
+window.addEventListener("touchend", (e) => {
+    keys["ArrowLeft"] = false;
+    keys["ArrowRight"] = false;
+}/*, { passive: true }*/);
+
 
 // --- LOGIKA ---
 function update() {

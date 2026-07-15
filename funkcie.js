@@ -68,6 +68,12 @@ function init() {
         });
     }
     gameOverMenu.style.display = "none";
+
+    document.getElementById("saveScoreForm").style.display = "block";
+    document.getElementById("usernameInput").value = ""; // Vyčistí textové pole
+    document.getElementById("leaderboardContainer").innerHTML = ""; // Vyčistí rebríček pri novej hre
+
+
 }
 
 
@@ -289,3 +295,106 @@ function resetGame() {
 // Prvé spustenie
 init();
 loop();
+
+
+// Úplne čistá funkcia pre uloženie skóre
+function saveScore() {
+    const usernameInput = document.getElementById("usernameInput");
+    const username = usernameInput.value.trim();
+
+    if (username === "") {
+        alert("Prosím, zadaj svoje meno predtým, ako uložíš skóre!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("score", score);
+
+    fetch("uloz_skore.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("Odpoveď servera:", data); 
+        
+        // SKRYJEME IBA FORMULÁR PRE MENO A UKLADANIE
+        // Keďže tlačidlo "Hrať znova" (btnRestart) je mimo tohto divu, zostane svietiť!
+        document.getElementById("saveScoreForm").style.display = "none";
+        document.getElementById("btnRestart").style.display = "block";
+    })
+    .catch(error => {
+        console.error("Chyba pri komunikácii so serverom:", error);
+        alert("Nepodarilo sa spojiť so serverom.");
+    });
+}
+
+
+
+// Koniec hry (Upravené na automatické ukladanie)
+function triggerGameOver() {
+    finalScoreText.innerText = "Dosiahnuté skóre: " + score;
+    gameOverMenu.style.display = "flex";
+    
+    // Aktivácia animácie nadpisu
+    const title = document.querySelector("h1");
+    if (title) {
+        title.classList.add("game-over-pulse");
+    }
+    
+}
+
+// Funkcia na stiahnutie TOP 10 z databázy a vygenerovanie tabuľky
+function loadLeaderboard() {
+    fetch("nacitaj_skore.php")
+    .then(response => response.json())
+    .then(data => {
+        const container = document.getElementById("leaderboardContainer");
+        if (!container) return;
+
+        // Prepnutie obsahu v okne: skryjeme Game Over menu, ukážeme Rebríček
+        document.getElementById("mainMenuContent").style.display = "none";
+        document.getElementById("leaderboardScreen").style.display = "block";
+
+        if (!Array.isArray(data)) {
+            container.innerHTML = "<p style='color: #ff0055;'>Chyba: Server vrátil neplatné dáta.</p>";
+            return;
+        }
+
+        if (data.length === 0) {
+            container.innerHTML = "<p style='color: #8a85a5; margin-top: 15px;'>Zatiaľ žiadne záznamy. Buď prvý!</p>";
+            return;
+        }
+
+        let html = `<table class="leaderboard-table">
+                        <tr>
+                            <th>Pozícia</th>
+                            <th>Hráč</th>
+                            <th>Skóre</th>
+                        </tr>`;
+
+        data.forEach((row, index) => {
+            html += `<tr>
+                        <td>#${index + 1}</td>
+                        <td>${row.username}</td>
+                        <td>${row.score}</td>
+                     </tr>`;
+        });
+
+        html += `</table>`;
+        container.innerHTML = html;
+    })
+    .catch(error => {
+        console.error("Chyba pri sieťovom načítaní rebríčka:", error);
+    });
+}
+
+function closeLeaderboard() {
+    // Prepnutie obsahu späť: skryjeme Rebríček, ukážeme Game Over menu
+    document.getElementById("leaderboardScreen").style.display = "none";
+    document.getElementById("mainMenuContent").style.display = "block";
+    
+    // Vyčistíme kontajner, aby sa pri ďalšom otvorení načítal znova čerstvý
+    document.getElementById("leaderboardContainer").innerHTML = "";
+}

@@ -50,18 +50,20 @@ canvas {
 
 /* Prekrytie obrazovky pri Game Over */
 #gameOverMenu {
-    display: none;
+    display: none; /* JavaScript toto zmení pri prehre na "flex" */
     position: absolute;
     top: 4px;
     left: 4px;
     width: 400px;
     height: 600px;
-    background: rgba(11, 9, 20, 0.85);
+    background: rgba(11, 9, 20, 0.9);
     border-radius: 12px;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
+    z-index: 10;
 }
 
 /* Červený nápis konca hry */
@@ -79,7 +81,25 @@ canvas {
     color: #fff;
 }
 
-/* Neónové reštartovacie tlačidlo */
+/* Kontajner pre ukladanie skóre (Meno + Tlačidlo) */
+#saveScoreForm {
+    margin-bottom: 20px;
+}
+
+/* Vstupné neónové textové pole na meno */
+#usernameInput {
+    padding: 10px; 
+    border-radius: 20px; 
+    border: 2px solid #ff007f; 
+    background: #15102a; 
+    color: white; 
+    font-family: 'Orbitron', sans-serif; 
+    text-align: center;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+}
+
+/* Všeobecný štýl pre všetky neónové tlačidlá */
 .btn {
     background: transparent;
     border: 2px solid #00ffcc;
@@ -92,9 +112,10 @@ canvas {
     transition: all 0.3s ease;
     text-transform: uppercase;
     box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+    display: block;
+    margin: 5px auto;
 }
 
-/* Efekt po nabehnutí myšou na tlačidlo */
 .btn:hover {
     background: #00ffcc;
     color: #0b0914;
@@ -102,11 +123,31 @@ canvas {
     transform: scale(1.05);
 }
 
+/* Špecifické menšie tlačidlo "Uložiť skóre" */
+#btnUlozit {
+    padding: 8px 20px; 
+    font-size: 0.9rem; 
+    margin-top: 10px;
+}
+
+/* Špecifické fialové tlačidlo "Rebríček" */
+#btnLeaderboard {
+    border-color: #bd00ff; 
+    color: #bd00ff; 
+    box-shadow: 0 0 10px rgba(189, 0, 255, 0.2);
+}
+
+#btnLeaderboard:hover {
+    background: #bd00ff;
+    color: #0b0914;
+    box-shadow: 0 0 20px rgba(189, 0, 255, 0.6);
+}
+
+/* Trieda, ktorú JavaScript pridá nadpisu pri Game Over */
 .game-over-pulse {
     animation: neonGlowPulse 1s ease-in-out infinite alternate;
 }
 
-/* Definícia animácie: zväčšenie a extrémne neónové rozsvietenie */
 @keyframes neonGlowPulse {
     0% {
         transform: scale(1.0);
@@ -114,8 +155,60 @@ canvas {
         text-shadow: 0 0 10px rgba(0, 255, 204, 0.6), 0 0 20px rgba(0, 255, 204, 0.3);
     }
     100% {
-        transform: scale(1.15); /* Zväčšenie o 15% */
-        color: #ff0055;         /* Zmena farby na neónovú červenú/ružovú */
+        transform: scale(1.15);
+        color: #ff0055;
         text-shadow: 0 0 20px rgba(255, 0, 85, 1), 0 0 40px rgba(255, 0, 85, 0.8), 0 0 60px rgba(255, 0, 85, 0.6);
     }
 }
+
+/* Štýlovanie tabuľky rebríčka pod hrou */
+#leaderboardContainer {
+    margin-top: 10px;
+    width: 100%;
+}    
+
+#leaderboardScrollWrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+#leaderboardScrollWrapper::-webkit-scrollbar-track {
+    background: rgba(11, 9, 20, 0.5);
+}
+
+#leaderboardScrollWrapper::-webkit-scrollbar-thumb {
+    background: #bd00ff;
+    border-radius: 3px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #0b0914;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(189, 0, 255, 0.2);
+    border: 2px solid #bd00ff;
+}
+
+.leaderboard-table th {
+    background: linear-gradient(45deg, #bd00ff, #ff007f);
+    color: white;
+    padding: 12px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.leaderboard-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(189, 0, 255, 0.1);
+    font-size: 0.85rem;
+}
+
+.leaderboard-table tr:hover {
+    background-color: rgba(255, 0, 127, 0.1);
+}
+
+.leaderboard-table tr:nth-child(2) td { color: #ffff00; font-weight: bold; }
+.leaderboard-table tr:nth-child(3) td { color: #cccccc; }
+.leaderboard-table tr:nth-child(4) td { color: #cd7f32; }
